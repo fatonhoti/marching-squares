@@ -7,6 +7,9 @@
 
 #include <fmt/format.h>
 
+// internal
+#include "renderer/shader.hpp"
+
 namespace {
 
 bool running = false;
@@ -63,6 +66,30 @@ int main() {
 
     fmt::println("OpenGL {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
+    std::optional<renderer::Shader> shader = renderer::createShader(
+        "assets/shaders/default.vert",
+        "assets/shaders/default.frag");
+    if (!shader.has_value()) {
+        fmt::println("Failed to create shader");
+        return -1;
+    }
+
+    const float lineSegments[] = {
+        -1.0f, 0.0f,
+        0.0f, 0.0f
+    };
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lineSegments), lineSegments, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
     ::running = true;
     while (::running) {
         glfwPollEvents();
@@ -74,6 +101,10 @@ int main() {
 
         glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shader->handle);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_LINES, 0, 2);
 
         glfwSwapBuffers(window);
     }

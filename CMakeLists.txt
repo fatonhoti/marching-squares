@@ -31,6 +31,8 @@ FetchContent_MakeAvailable(glfw)
 
 add_executable(marching-squares
     src/main.cpp
+
+    src/renderer/shader.cpp
 )
 
 target_compile_features(marching-squares PRIVATE cxx_std_20)
