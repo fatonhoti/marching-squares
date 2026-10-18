@@ -1,5 +1,11 @@
-#include <fmt/format.h>
+// vendor
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+#define GLAD_GL_IMPLEMENTATION
+#include "glad2/gl.h"
+
+#include <fmt/format.h>
 
 namespace {
 
@@ -34,6 +40,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     GLFWwindow* window = glfwCreateWindow(1280, 720, "marching-squares", nullptr, nullptr);
     if (window == nullptr) {
@@ -42,8 +49,16 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
 
+    {
+        const int version = gladLoadGL(glfwGetProcAddress);
+        if (version == 0) {
+            printf("Failed to initialize OpenGL context\n");
+            return -1;
+        }
+    }
+
+    //glfwSwapInterval(1);
     glfwSetKeyCallback(window, ::key_callback);
 
     fmt::println("OpenGL {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));

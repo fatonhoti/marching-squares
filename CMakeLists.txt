@@ -42,3 +42,5 @@ target_compile_options(marching-squares PRIVATE
 )
 
 target_link_libraries(marching-squares PRIVATE fmt::fmt glfw OpenGL::GL)
+
+target_include_directories(marching-squares PRIVATE vendor)
